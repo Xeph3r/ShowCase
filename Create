@@ -1,0 +1,82 @@
+//
+//  Create.swift
+//  Showcase
+//
+//  Created by Siddharth Malik on 3/6/15.
+//  Copyright (c) 2015 Siddharth Malik. All rights reserved.
+//
+
+import UIKit
+
+class Create: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+
+    @IBOutlet weak var SelectedImage: UIImageView!
+    @IBOutlet weak var BasicWriteUp: UITextView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        BasicWriteUp.layer.borderColor = UIColor.blackColor().CGColor
+        BasicWriteUp.layer.borderWidth = 0.5
+        BasicWriteUp.layer.cornerRadius = 5
+        BasicWriteUp.becomeFirstResponder()
+        
+        // Do any additional setup after loading the view.
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    func imagePickerController(picker: UIImagePickerController!, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        self.SelectedImage.image = image
+        
+    }
+    
+    @IBAction func ImportImage(sender: AnyObject){
+    
+        let ImagePicker = UIImagePickerController()
+        ImagePicker.delegate = self
+        ImagePicker.allowsEditing = false
+       
+        
+        let ActionSheet = UIAlertController(title: "Choose an Image", message: "from the following sources" , preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let libButton = UIAlertAction(title: "Select From Library", style: UIAlertActionStyle.Default) { (libSelected) -> Void in
+            ImagePicker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+            self.presentViewController(ImagePicker, animated: true, completion: nil)
+        }
+        ActionSheet.addAction(libButton)
+         let cameraButton = UIAlertAction(title: "Take a Picture", style: UIAlertActionStyle.Default) { (camSelected) -> Void in
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera){
+                ImagePicker.sourceType = UIImagePickerControllerSourceType.Camera
+                self.presentViewController(ImagePicker, animated: true, completion: nil)
+            }
+            else{
+                println("camera not available")
+            }
+        
+        }
+        let cancelButton = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (cancelSelected) -> Void in
+            
+        }
+        ActionSheet.addAction(cancelButton)
+        self.presentViewController(ActionSheet, animated: true, completion: nil)
+    }
+    @IBAction func AddPicture(sender: AnyObject) {
+        var showcase:PFObject = PFObject(className: "showcase")
+        showcase["writeUp"] = BasicWriteUp.text
+        showcase.saveInBackground()
+        self.navigationController?.popToRootViewControllerAnimated(true)
+    }
+
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}
